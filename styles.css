@@ -1,0 +1,73 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-image: url('background.jpg'); /* Фоновое изображение */
+    background-size: cover; /* Масштабируем фон на весь экран */
+    overflow: hidden; /* Убираем прокрутку */
+}
+
+#game-container {
+    position: relative;
+    text-align: center;
+    height: 100vh; /* Высота контейнера на весь экран */
+}
+
+#score {
+    font-size: 36px;
+    color: white;
+    position: absolute;
+    top: 20px; /* Расположение счетчика */
+    left: 50%;
+    transform: translateX(-50%); /* Центрируем счетчик */
+}
+
+#rat {
+    width: 150px; /* Размер крысы */
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%); /* Центрируем крысу */
+    cursor: pointer;
+    transition: transform 0.1s; /* Эффект нажатия */
+}
+
+#rat:active {
+    transform: scale(0.9); /* Эффект нажатия */
+}
+
+#popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8); /* Полупрозрачный фон */
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.hidden {
+    display: none; /* Скрываем поп-ап по умолчанию */
+}
+
+#popup-content {
+    text-align: center;
+}
+
+#start-button {
+    padding: 10px 20px;
+    font-size: 18px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#start-button:hover {
+    background-color: #45a049;
+}

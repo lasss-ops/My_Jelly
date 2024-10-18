@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tap Game</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-image: url('background.jpg');
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        #gameArea {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #rat {
+            width: 150px; /* Увеличиваем размер изображения */
+            height: auto;
+            position: absolute;
+            animation: shake 0.2s;
+            transition: transform 0.1s;
+            z-index: 1;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(0); }
+            50% { transform: translate(-5px, -5px); }
+            100% { transform: translate(0); }
+        }
+
+        #score {
+            position: absolute;
+            top: 20px;
+            font-size: 40px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Тень для текста */
+            z-index: 2;
+            text-align: center;
+        }
+
+        .message {
+            position: absolute;
+            color: white;
+            font-size: 24px; /* Увеличиваем размер текста сообщения */
+            z-index: 2;
+            transition: opacity 0.5s, transform 0.5s; /* Плавное исчезновение и движение */
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div id="gameArea">
+        <div id="score">ZHELE: 0</div>
+        <img id="rat" src="rat.png" alt="Крыса" />
+    </div>
+
+    <script>
+        let score = 0;
+
+        const rat = document.getElementById('rat');
+        const scoreDisplay = document.getElementById('score');
+
+        rat.addEventListener('click', function(event) {
+            score++;
+            scoreDisplay.textContent = 'ZHELE: ' + score;
+
+            // Создание сообщения
+            const message = document.createElement('div');
+            message.className = 'message';
+            message.textContent = '+1';
+            message.style.left = event.clientX + 'px';
+            message.style.top = event.clientY + 'px';
+            document.body.appendChild(message);
+
+            // Плавное движение вверх и исчезновение сообщения
+            setTimeout(() => {
+                message.style.transform = 'translateY(-50px)'; // Поднимаем сообщение вверх
+                message.style.opacity = '0'; // Убираем видимость
+            }, 10); // Задержка для анимации
+
+            // Удаляем сообщение через 1 секунду
+            setTimeout(() => {
+                document.body.removeChild(message);
+            }, 1000);
+
+            // Анимация нажатия
+            rat.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                rat.style.transform = 'scale(1)';
+            }, 100);
+        });
+    </script>
+</body>
+</html>
