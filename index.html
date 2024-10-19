@@ -4,104 +4,123 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tap Game</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-image: url('background.jpg');
-            background-size: cover;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            font-family: Arial, sans-serif;
-        }
-
-        #gameArea {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #rat {
-            width: 150px; /* Увеличиваем размер изображения */
-            height: auto;
-            position: absolute;
-            animation: shake 0.2s;
-            transition: transform 0.1s;
-            z-index: 1;
-        }
-
-        @keyframes shake {
-            0% { transform: translate(0); }
-            50% { transform: translate(-5px, -5px); }
-            100% { transform: translate(0); }
-        }
-
-        #score {
-            position: absolute;
-            top: 20px;
-            font-size: 40px;
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Тень для текста */
-            z-index: 2;
-            text-align: center;
-        }
-
-        .message {
-            position: absolute;
-            color: white;
-            font-size: 24px; /* Увеличиваем размер текста сообщения */
-            z-index: 2;
-            transition: opacity 0.5s, transform 0.5s; /* Плавное исчезновение и движение */
-            transform: translateY(0);
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css"> <!-- Подключаем файл стилей -->
 </head>
 <body>
     <div id="gameArea">
         <div id="score">ZHELE: 0</div>
-        <img id="rat" src="rat.png" alt="Крыса" />
+        <div id="level">Уровень: 1</div>
+        <div id="nextLevel">Осталось до следующего уровня: 100</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <img id="jelly" src="jelly.png" alt="Желе" />
+        <button id="bonusButton">BONUS GAME</button>
+        <div id="countdown"></div>
     </div>
+
+    <audio id="tapSound" src="tap_sound.mp3" preload="auto"></audio>
 
     <script>
         let score = 0;
-
-        const rat = document.getElementById('rat');
+        let level = 1;
+        const levelUpScore = 100;
+        const jelly = document.getElementById('jelly');
         const scoreDisplay = document.getElementById('score');
+        const levelDisplay = document.getElementById('level');
+        const nextLevelDisplay = document.getElementById('nextLevel');
+        const tapSound = document.getElementById('tapSound');
+        const progressBar = document.getElementById('progressBar');
+        const bonusButton = document.getElementById('bonusButton');
+        const countdownDisplay = document.getElementById('countdown');
+        let bonusMode = false;
 
-        rat.addEventListener('click', function(event) {
-            score++;
+        function updateNextLevelDisplay() {
+            const neededScore = level * levelUpScore - score;
+            nextLevelDisplay.textContent = 'Осталось до следующего уровня: ' + Math.max(0, neededScore);
+        }
+
+        jelly.addEventListener('click', function(event) {
+            if (bonusMode) {
+                score += 10;
+            } else {
+                score++;
+            }
+
             scoreDisplay.textContent = 'ZHELE: ' + score;
 
-            // Создание сообщения
+            if (score >= level * levelUpScore) {
+                level++;
+                levelDisplay.textContent = 'Уровень: ' + level;
+            }
+
+            const progress = (score % levelUpScore) / levelUpScore * 100;
+            progressBar.style.width = progress + '%';
+
+            updateNextLevelDisplay();
+
+            tapSound.currentTime = 0;
+            tapSound.play();
+
             const message = document.createElement('div');
             message.className = 'message';
-            message.textContent = '+1';
+            message.textContent = bonusMode ? '+10' : '+1';
             message.style.left = event.clientX + 'px';
             message.style.top = event.clientY + 'px';
             document.body.appendChild(message);
 
-            // Плавное движение вверх и исчезновение сообщения
             setTimeout(() => {
-                message.style.transform = 'translateY(-50px)'; // Поднимаем сообщение вверх
-                message.style.opacity = '0'; // Убираем видимость
-            }, 10); // Задержка для анимации
+                message.style.transform = 'translateY(-50px)';
+                message.style.opacity = '0';
+            }, 10);
 
-            // Удаляем сообщение через 1 секунду
             setTimeout(() => {
                 document.body.removeChild(message);
             }, 1000);
 
-            // Анимация нажатия
-            rat.style.transform = 'scale(0.9)';
+            jelly.style.transform = 'translate(-50%, -50%) scale(0.9)';
             setTimeout(() => {
-                rat.style.transform = 'scale(1)';
+                jelly.style.transform = 'translate(-50%, -50%) scale(1)';
             }, 100);
         });
+
+        bonusButton.addEventListener('click', function() {
+            bonusButton.style.display = 'none';
+            startCountdown(3);
+        });
+
+        function startCountdown(seconds) {
+            let remainingTime = seconds;
+            countdownDisplay.textContent = 'Осталось ' + remainingTime + ' секунд';
+            countdownDisplay.style.display = 'block';
+
+            const countdownInterval = setInterval(() => {
+                remainingTime--;
+                countdownDisplay.textContent = 'Осталось ' + remainingTime + ' секунд';
+
+                if (remainingTime <= 0) {
+                    clearInterval(countdownInterval);
+                    startBonusGame();
+                }
+            }, 1000);
+        }
+
+        function startBonusGame() {
+            bonusMode = true;
+            countdownDisplay.textContent = 'Осталось 20 секунд';
+            setTimeout(() => {
+                countdownDisplay.style.display = 'none';
+                jelly.style.transform = 'translate(-50%, -50%) scale(1)';
+            }, 20000);
+        }
+
+        updateNextLevelDisplay();
+
+        window.onload = () => {
+            jelly.style.left = '50%';
+            jelly.style.top = '50%';
+            jelly.style.transform = 'translate(-50%, -50%)';
+        };
     </script>
 </body>
 </html>
